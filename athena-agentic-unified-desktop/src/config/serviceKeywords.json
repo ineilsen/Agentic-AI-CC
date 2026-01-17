@@ -1,0 +1,5 @@
+{
+  "broadband": ["broadband", "fiber", "fibre", "internet", "wifi", "fttp", "dsl", "vdsl", "adsl"],
+  "mobile": ["mobile", "cell", "sim", "handset", "5g", "4g"],
+  "tv": ["tv", "television", "settop", "set-top", "set top", "decoder", "settopbox"]
+}

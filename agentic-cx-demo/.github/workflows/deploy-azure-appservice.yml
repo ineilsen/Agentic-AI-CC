@@ -1,0 +1,65 @@
+name: Deploy Agentic CX Demo to Azure App Service
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: agentic-cx-demo-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # The CX Demo server is in ./server and serves static assets from ../client/public.
+      # To keep that layout intact on Azure, we deploy BOTH ./server and ./client.
+      # We also install production deps into ./server/node_modules so App Service can run
+      # without relying on build detection in a subfolder.
+      - name: Install server dependencies (production)
+        working-directory: server
+        run: npm ci --omit=dev
+
+      - name: Package app (zip)
+        run: |
+          rm -f app.zip
+          zip -r app.zip server client \
+            -x "**/.git/**" \
+            -x "**/.github/**" \
+            -x "**/.env" \
+            -x "**/.env.*"
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME_CX_DEMO }}
+          package: app.zip
+
+      # Alternative auth method: publish profile
+      # - name: Deploy to Azure Web App (publish profile)
+      #   uses: azure/webapps-deploy@v3
+      #   with:
+      #     app-name: ${{ secrets.AZURE_WEBAPP_NAME_CX_DEMO }}
+      #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_CX_DEMO }}
+      #     package: app.zip

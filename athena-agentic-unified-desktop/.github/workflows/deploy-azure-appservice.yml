@@ -1,0 +1,64 @@
+name: Deploy Athena (Unified Desktop) to Azure App Service
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: athena-unified-desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Package app (zip)
+        run: |
+          rm -f app.zip
+          zip -r app.zip . \
+            -x "**/.git/**" \
+            -x "**/.github/**" \
+            -x "**/node_modules/**" \
+            -x "**/.env" \
+            -x "**/.env.*"
+
+      # Recommended auth method: OIDC (no long-lived secrets)
+      # Create an Entra App Registration and add a Federated Credential for this repo.
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME_ATHENA }}
+          package: app.zip
+
+      # Alternative (simpler) auth method: publish profile
+      # - name: Deploy to Azure Web App (publish profile)
+      #   uses: azure/webapps-deploy@v3
+      #   with:
+      #     app-name: ${{ secrets.AZURE_WEBAPP_NAME_ATHENA }}
+      #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_ATHENA }}
+      #     package: app.zip
