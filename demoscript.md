@@ -105,8 +105,6 @@
 
 ## <a id="screens"></a>Screenshots (click to zoom)
 
-<p>Drop images into <code>docs/screenshots/</code>. GitHub will render thumbnails and you can click to zoom.</p>
-
 <table>
   <tr>
     <td align="center">
@@ -141,7 +139,7 @@
 </table>
 
 <blockquote>
-  <p><strong>Tip:</strong> If you don’t have screenshots yet, capture them in this order so the script matches the visuals. See <code>docs/screenshots/README.md</code> for suggested filenames.</p>
+  <p><strong>Tip:</strong> Capture screenshots in this order so the script matches the visuals. See <code>docs/screenshots/README.md</code> for filenames.</p>
 </blockquote>
 
 ---
