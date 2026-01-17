@@ -24,18 +24,18 @@
 
 <ul>
   <li><strong>Customer ID</strong> (use the same everywhere): <code>GB13820473</code> (or any from your pool)</li>
-  <li><strong>Athena base URL</strong>: <code>http://localhost:3001</code> (local) or <code>https://&lt;athena-app&gt;.azurewebsites.net</code> (Azure)</li>
-  <li><strong>CX Demo base URL</strong>: <code>http://localhost:4002</code> (local) or <code>https://&lt;cx-app&gt;.azurewebsites.net</code> (Azure)</li>
+  <li><strong>Athena base URL</strong>: <code>http://localhost:3001</code> (local) or <code>https://athena-desktop-app.azurewebsites.net</code> (Azure)</li>
+  <li><strong>CX Demo base URL</strong>: <code>http://localhost:4002</code> (local) or <code>https://agentic-cx-demo-1768502151.azurewebsites.net</code> (Azure)</li>
 </ul>
 
 <p><strong>Open these two tabs:</strong></p>
 
 <ol>
   <li><strong>Athena (agent view):</strong><br/>
-    <code>&lt;ATHENA_BASE_URL&gt;/?cust=&lt;CUSTOMER_ID&gt;</code>
+    <code>https://athena-desktop-app.azurewebsites.net/?cust=GB13820473</code>
   </li>
   <li><strong>CX Demo (customer view, clean start):</strong><br/>
-    <code>&lt;CX_BASE_URL&gt;/?cust=&lt;CUSTOMER_ID&gt;&amp;athena=&lt;ATHENA_BASE_URL&gt;&amp;reset=1</code>
+    <code>https://agentic-cx-demo-1768502151.azurewebsites.net/?cust=GB13820473&amp;athena=https://athena-desktop-app.azurewebsites.net&amp;reset=1</code>
   </li>
 </ol>
 
@@ -71,16 +71,16 @@
 <details>
   <summary><strong>Azure runbook (on-stage / shared demos)</strong></summary>
 
-  <p><strong>Example URLs</strong> (replace with your deployed app names):</p>
+  <p><strong>Azure URLs</strong>:</p>
   <ul>
-    <li>Athena: <code>https://&lt;athena-app&gt;.azurewebsites.net</code></li>
-    <li>CX Demo: <code>https://&lt;cx-app&gt;.azurewebsites.net</code></li>
+    <li>Athena: <code>https://athena-desktop-app.azurewebsites.net</code></li>
+    <li>CX Demo: <code>https://agentic-cx-demo-1768502151.azurewebsites.net</code></li>
   </ul>
 
   <p><strong>Open these:</strong></p>
   <ol>
-    <li>Athena: <code>https://&lt;athena-app&gt;.azurewebsites.net/?cust=GB13820473</code></li>
-    <li>CX Demo (clean start): <code>https://&lt;cx-app&gt;.azurewebsites.net/?cust=GB13820473&amp;athena=https://&lt;athena-app&gt;.azurewebsites.net&amp;reset=1</code></li>
+    <li>Athena: <code>https://athena-desktop-app.azurewebsites.net/?cust=GB13820473</code></li>
+    <li>CX Demo (clean start): <code>https://agentic-cx-demo-1768502151.azurewebsites.net/?cust=GB13820473&amp;athena=https://athena-desktop-app.azurewebsites.net&amp;reset=1</code></li>
   </ol>
 
 </details>
