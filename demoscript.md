@@ -1,4 +1,4 @@
-# Athena Agentic Unified Desktop — Demo Script (Marketing)
+# Athena Agentic Unified Desktop — Demo Script (Sales & Marketing)
 
 <p><strong>Audience promise:</strong> Watch how Athena + Neuro SAN turns a messy, live customer issue into a confident, guided resolution—<strong>plan → execute → explain → respond</strong>—in real time.</p>
 
@@ -8,6 +8,7 @@
   <summary><strong>Table of contents</strong></summary>
   <ul>
     <li><a href="#demo-control-panel">Demo control panel (copy/paste links)</a></li>
+    <li><a href="#reset">Reset (reset=1) — must-use for clean demos</a></li>
     <li><a href="#runbook">Setup & run (local + Azure)</a></li>
     <li><a href="#screens">Screenshots (click to zoom)</a></li>
     <li><a href="#operator">Operator notes (repeatable demos)</a></li>
@@ -42,6 +43,21 @@
 <blockquote>
   <p><strong>Why <code>reset=1</code> matters:</strong> Athena stores demo chat state in memory keyed by customer ID. A page refresh does not clear it. Reset gives you a clean, scripted run every time.</p>
 </blockquote>
+
+---
+
+## <a id="reset"></a>Reset (<code>reset=1</code>) — must-use for clean demos
+
+<p><strong>This is the #1 setup consideration.</strong> Athena keeps conversation state in memory per <code>cust</code>. If you reuse the same customer ID, previous context can “bleed” into your next run.</p>
+
+<ul>
+  <li><strong>Always start CX Demo with <code>reset=1</code></strong> to clear Athena’s state before SSE connects.</li>
+  <li><strong>Mid-demo recovery:</strong> if anything gets unscripted, reload the CX Demo tab using the same URL (keep <code>cust</code> the same) with <code>reset=1</code>.</li>
+  <li><strong>Do not rely on refresh alone:</strong> refreshing either tab does not guarantee a clean state.</li>
+</ul>
+
+<p><strong>Clean-start URL (Azure):</strong><br/>
+<code>https://agentic-cx-demo-1768502151.azurewebsites.net/?cust=GB13820473&amp;athena=https://athena-desktop-app.azurewebsites.net&amp;reset=1</code></p>
 
 ---
 
