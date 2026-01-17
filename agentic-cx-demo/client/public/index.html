@@ -534,13 +534,10 @@
 				}
 
 				function bestReplyFromPayload(payload){
-					return (
-						payload?.botReply ||
-						payload?.insights?.LIVE_RESPONSE?.draft ||
-						payload?.insights?.AI_SUMMARY?.summary ||
-						payload?.customer360?.summary ||
-						''
-					);
+					// Only show customer-visible replies when Athena explicitly provides a botReply.
+					// If auto replies are suppressed, do not fall back to draft widgets.
+					if (payload?.autoReplySuppressed) return '';
+					return payload?.botReply || '';
 				}
 
 				function isTruthyParam(v){

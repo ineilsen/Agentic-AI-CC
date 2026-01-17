@@ -295,7 +295,7 @@ router.post('/v1/external-chat', async (req, res) => {
 		}
 		const traceId = `${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
 		const payload = SUPPRESS_AUTO
-			? { customer360, wordcloud, insights, traceId }
+			? { customer360, wordcloud, insights, traceId, autoReplySuppressed: true }
 			: { customer360, wordcloud, insights, botReply, traceId };
 		// persist latest state in memory so front-end can poll
 		lastCustomer360.set(customerId, payload);
