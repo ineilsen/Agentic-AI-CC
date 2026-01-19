@@ -18,29 +18,6 @@ function getQueryParam(name){
 function isTruthyParam(v){
 	return /^(1|true|yes)$/i.test(String(v || '').trim());
 }
-
-async function maybeResetFromAthenaUrl(){
-	try {
-		const reset = getQueryParam('reset');
-		const cust = getQueryParam('cust');
-		if (!isTruthyParam(reset) || !cust) return;
-		console.debug('[reset] Athena URL requested reset', { cust });
-		const resp = await fetch('/api/v1/reset-customer', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ customerId: cust })
-		});
-		if (!resp.ok) {
-			let details = '';
-			try { details = await resp.text(); } catch(_) {}
-			console.warn('[reset] reset-customer failed', resp.status, details);
-		} else {
-			console.debug('[reset] reset-customer ok');
-		}
-	} catch (e) {
-		console.warn('[reset] reset-customer threw', e);
-	}
-}
 function pickInitialCustomerId(){
 	const fromQuery = getQueryParam('cust');
 	if (fromQuery) {
@@ -133,25 +110,45 @@ function initEventBridges() {
 	window.addEventListener('insightsPartialUpdate', (e) => applyData(e.detail));
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-	await maybeResetFromAthenaUrl();
+document.addEventListener('DOMContentLoaded', () => {
 	console.debug('[Main] DOMContentLoaded - booting modules');
 	customerPanel.init();
 	aiPanel.init();
 	conversationPanel.init();
 	initEventBridges();
 	updateCustomerBadge();
-	initialLoad();
+
+	const url = new URL(window.location.href);
+	const resetEnabled = isTruthyParam(url.searchParams.get('reset'));
+	const didResetForCustomer = new Set();
+	async function maybeResetCustomer(customerId){
+		try {
+			if (!resetEnabled) return;
+			if (!customerId) return;
+			if (didResetForCustomer.has(customerId)) return;
+			didResetForCustomer.add(customerId);
+			console.debug('[reset] resetting customer state', { customerId });
+			await fetch('/api/v1/reset-customer', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ customerId })
+			});
+		} catch (e) {
+			console.warn('[reset] failed (continuing anyway)', e);
+		}
+	}
 
 	// SSE stream for real-time customer360
-	function startCustomerStream(){
+	let initSSE;
+	async function startCustomerStream(){
 		if (window.__custEvtSrc) { try { window.__custEvtSrc.close(); } catch(_){} }
-		initSSE(activeCustomerId);
+		await maybeResetCustomer(activeCustomerId);
+		if (typeof initSSE === 'function') initSSE(activeCustomerId);
 	}
 	(function initSSEBootstrap(){
 		let attempt = 0;
 		const maxDelay = 30000;
-		function initSSE(customer){
+		initSSE = function(customer){
 			function connect(){
 			attempt++;
 			const evtSrc = new EventSource(`/api/v1/stream/customer-360/${customer}`);
@@ -197,8 +194,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 			};
 			}
 			connect();
-		}
+		};
 		// initial stream
-		initSSE(activeCustomerId);
+		(async () => {
+			await maybeResetCustomer(activeCustomerId);
+			initialLoad();
+			initSSE(activeCustomerId);
+		})();
 	})();
 });
