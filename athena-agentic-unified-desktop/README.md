@@ -49,7 +49,7 @@ Security note: never commit real API keys.
 ## UI behavior
 
 - Active customer ID can be provided via the URL: `?cust=<ID>` or `?cust=random`.
-- Demo ID pool: `GB26669607`, `GB13820473`, `GB22446688`, `GB77553311`, `GB99001234`.
+- Demo ID pool: `GB26669607`, `GB13820473`, `GB22446688`, `GB77553311`, `GB99001234`, `GB11002233`, `GB22003344`, `GB33004455`, `GB44005566`, `GB55006677`, `GB66007788`, `GB77008899`, `GB88009900`, `GB99112233`, `GB12345098`.
 - “Agent Network Actions” lets you switch orchestration engine (Neuro‑SAN vs OpenAI).
 - SSE pushes keep the UI updated with Customer 360, sentiment/risk, NBA, and agent replies.
 

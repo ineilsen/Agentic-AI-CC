@@ -4,7 +4,7 @@ import * as customerPanel from './modules/customerPanel.js';
 import * as conversationPanel from './modules/conversationPanel.js';
 // Simple in-memory queue state (demo). In production fetched from backend.
 // Predefined demo customer IDs for easy simulation & consistency across apps
-const DEMO_CUSTOMER_IDS = ['GB26669607', 'GB13820473', 'GB22446688', 'GB77553311', 'GB99001234'];
+const DEMO_CUSTOMER_IDS = ['GB26669607', 'GB13820473', 'GB22446688', 'GB77553311', 'GB99001234', 'GB11002233', 'GB22003344', 'GB33004455', 'GB44005566', 'GB55006677', 'GB66007788', 'GB77008899', 'GB88009900', 'GB99112233', 'GB12345098'];
 const queueState = new Map(); // customerId -> { lastMessage, updatedAt }
 function generateDemoCustomerId(){
 	const n = Math.floor(Math.random()*90000000) + 10000000; // 8 digits
@@ -13,10 +13,6 @@ function generateDemoCustomerId(){
 function getQueryParam(name){
 	const url = new URL(window.location.href);
 	return url.searchParams.get(name);
-}
-
-function isTruthyParam(v){
-	return /^(1|true|yes)$/i.test(String(v || '').trim());
 }
 function pickInitialCustomerId(){
 	const fromQuery = getQueryParam('cust');
@@ -117,38 +113,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	conversationPanel.init();
 	initEventBridges();
 	updateCustomerBadge();
-
-	const url = new URL(window.location.href);
-	const resetEnabled = isTruthyParam(url.searchParams.get('reset'));
-	const didResetForCustomer = new Set();
-	async function maybeResetCustomer(customerId){
-		try {
-			if (!resetEnabled) return;
-			if (!customerId) return;
-			if (didResetForCustomer.has(customerId)) return;
-			didResetForCustomer.add(customerId);
-			console.debug('[reset] resetting customer state', { customerId });
-			await fetch('/api/v1/reset-customer', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ customerId })
-			});
-		} catch (e) {
-			console.warn('[reset] failed (continuing anyway)', e);
-		}
-	}
+	initialLoad();
 
 	// SSE stream for real-time customer360
-	let initSSE;
-	async function startCustomerStream(){
+	function startCustomerStream(){
 		if (window.__custEvtSrc) { try { window.__custEvtSrc.close(); } catch(_){} }
-		await maybeResetCustomer(activeCustomerId);
-		if (typeof initSSE === 'function') initSSE(activeCustomerId);
+		initSSE(activeCustomerId);
 	}
 	(function initSSEBootstrap(){
 		let attempt = 0;
 		const maxDelay = 30000;
-		initSSE = function(customer){
+		function initSSE(customer){
 			function connect(){
 			attempt++;
 			const evtSrc = new EventSource(`/api/v1/stream/customer-360/${customer}`);
@@ -194,12 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			};
 			}
 			connect();
-		};
+		}
 		// initial stream
-		(async () => {
-			await maybeResetCustomer(activeCustomerId);
-			initialLoad();
-			initSSE(activeCustomerId);
-		})();
+		initSSE(activeCustomerId);
 	})();
 });
