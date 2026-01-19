@@ -14,6 +14,33 @@ function getQueryParam(name){
 	const url = new URL(window.location.href);
 	return url.searchParams.get(name);
 }
+
+function isTruthyParam(v){
+	return /^(1|true|yes)$/i.test(String(v || '').trim());
+}
+
+async function maybeResetFromAthenaUrl(){
+	try {
+		const reset = getQueryParam('reset');
+		const cust = getQueryParam('cust');
+		if (!isTruthyParam(reset) || !cust) return;
+		console.debug('[reset] Athena URL requested reset', { cust });
+		const resp = await fetch('/api/v1/reset-customer', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ customerId: cust })
+		});
+		if (!resp.ok) {
+			let details = '';
+			try { details = await resp.text(); } catch(_) {}
+			console.warn('[reset] reset-customer failed', resp.status, details);
+		} else {
+			console.debug('[reset] reset-customer ok');
+		}
+	} catch (e) {
+		console.warn('[reset] reset-customer threw', e);
+	}
+}
 function pickInitialCustomerId(){
 	const fromQuery = getQueryParam('cust');
 	if (fromQuery) {
@@ -106,7 +133,8 @@ function initEventBridges() {
 	window.addEventListener('insightsPartialUpdate', (e) => applyData(e.detail));
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+	await maybeResetFromAthenaUrl();
 	console.debug('[Main] DOMContentLoaded - booting modules');
 	customerPanel.init();
 	aiPanel.init();
